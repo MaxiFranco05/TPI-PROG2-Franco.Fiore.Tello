@@ -11,9 +11,9 @@ public class Producto extends Base{
 
     public Producto(String nombre, Double precio, String descripcion, int stock, String imagen,Categoria categoria) {
         this.setNombre(nombre);
-        this.precio = precio;
+        this.setPrecio(precio);
         this.setDescripcion(descripcion);
-        this.stock = stock;
+        this.setStock(stock);
         this.setImagen(imagen);
         this.disponible = stock>0;
         this.setCategoria(categoria);
@@ -65,6 +65,7 @@ public class Producto extends Base{
     }
 
 
+
     public void setCategoria(Categoria categoria) {
         this.categoria = categoria;
         if(categoria!=null && !categoria.getProductos().contains(this)){
@@ -82,5 +83,24 @@ public class Producto extends Base{
             this.imagen = "sin imagen.png";
         }
     }
+
+    public void setPrecio(Double precio) {
+        if (precio != null && precio >= 0) {
+            this.precio = precio;
+        } else {
+            // Lancar un Exception para precio
+        }
+    }
+
+    public void setStock(int stock) {
+        if (stock >= 0) {
+            this.stock = stock;
+            this.disponible = stock > 0;
+        } else {
+            // / Lancar un Exception para setProducto
+        }
+    }
+
+    // Falta agregar toString y equals
 
 }
