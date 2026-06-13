@@ -14,7 +14,7 @@ public class Producto extends Base{
         this.precio = precio;
         this.setDescripcion(descripcion);
         this.stock = stock;
-        this.imagen = imagen;
+        this.setImagen(imagen);
         this.disponible = stock>0;
         this.setCategoria(categoria);
     }
@@ -64,11 +64,23 @@ public class Producto extends Base{
         }
     }
 
+
     public void setCategoria(Categoria categoria) {
         this.categoria = categoria;
         if(categoria!=null && !categoria.getProductos().contains(this)){
             categoria.addProductoToProductos(this);
 
+
+        }
+
+    }
+    public void setImagen(String imagen) {
+        if (imagen != null && !imagen.isBlank()) {
+            this.imagen = imagen;
+        } else {
+
+            this.imagen = "sin imagen.png";
         }
     }
+
 }
