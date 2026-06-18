@@ -101,6 +101,21 @@ public class Producto extends Base{
         }
     }
 
-    // Falta agregar toString y equals
+    @Override
+    public String toString() {
+        return "Producto [ID=" + getId() + "] " + nombre +
+                " | Precio: $" + precio +
+                " | Stock: " + stock +
+                " | Categoría: " + (categoria != null ? categoria.getNombre() : "Sin categoría") +
+                " | Disponible: " + (disponible ? "Sí" : "No");
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof Producto)) return false;
+        Producto otro = (Producto) obj;
+        return this.getId().equals(otro.getId());
+    }
 
 }

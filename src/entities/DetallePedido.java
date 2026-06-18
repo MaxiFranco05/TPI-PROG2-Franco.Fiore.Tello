@@ -5,6 +5,7 @@ public class DetallePedido extends Base{
     private Double subtotal;
     private Producto producto;
 
+
     public Double getSubtotal() {
         return subtotal;
     }
