@@ -83,21 +83,22 @@ public class Producto extends Base{
             this.imagen = "sin imagen.png";
         }
     }
-
+    // En setPrecio, Tienen que crear una carpeta donde exista la excepcion:
     public void setPrecio(Double precio) {
         if (precio != null && precio >= 0) {
             this.precio = precio;
         } else {
-            // Lancar un Exception para precio
+            throw new PrecioInvalidoException("El precio no puede ser negativo ni nulo.");
         }
     }
 
+    // En setStock, Tienen que crear una carpeta donde exista la excepcion:
     public void setStock(int stock) {
         if (stock >= 0) {
             this.stock = stock;
             this.disponible = stock > 0;
         } else {
-            // / Lancar un Exception para setProducto
+            throw new StockInvalidoException("El stock no puede ser negativo.");
         }
     }
 
