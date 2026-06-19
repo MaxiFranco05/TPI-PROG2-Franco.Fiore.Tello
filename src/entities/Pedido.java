@@ -25,7 +25,7 @@ public class Pedido extends Base implements Calculable {
         this.estado = Estado.PENDIENTE;
         this.detalles = new ArrayList<>();
     }
-
+    // Metodos
     public void addDetallePedido(int cantidad, Double precio, Producto producto) {
         DetallePedido detalle = new DetallePedido(cantidad, producto);
         detalles.add(detalle);
@@ -59,6 +59,7 @@ public class Pedido extends Base implements Calculable {
         }
         this.total = acumTotal;
     }
+    // Getters
 
     public LocalDate getFecha() { return fecha; }
     public Estado getEstado() { return estado; }
@@ -66,6 +67,8 @@ public class Pedido extends Base implements Calculable {
     public FormaPago getFormaPago() { return formaPago; }
     public Usuario getUsuario() { return usuario; }
     public List<DetallePedido> getDetalles() { return detalles; }
+
+    // Setters
 
     public void setEstado(Estado estado) { this.estado = estado; }
     public void setFormaPago(FormaPago formaPago) { this.formaPago = formaPago; }

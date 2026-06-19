@@ -8,6 +8,8 @@ public class DetallePedido extends Base {
     private Double subtotal;
     private Producto producto;
 
+
+
     public DetallePedido(int cantidad, Producto producto) {
         if (cantidad <= 0) throw new StockInvalidoException("La cantidad debe ser mayor a 0.");
 
@@ -18,9 +20,12 @@ public class DetallePedido extends Base {
         this.producto = producto;
         this.subtotal = cantidad * producto.getPrecio();
     }
+    // Getters
     public int getCantidad() { return cantidad; }
     public Double getSubtotal() { return subtotal; }
     public Producto getProducto() { return producto; }
+
+    // Setters
 
     public void setCantidad(int cantidad) {
         if (cantidad <= 0) throw new StockInvalidoException("La cantidad debe ser mayor a 0.");

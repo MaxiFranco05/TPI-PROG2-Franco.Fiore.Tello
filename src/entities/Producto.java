@@ -1,5 +1,6 @@
 package entities;
-
+import exceptions.PrecioInvalidoException;
+import exceptions.StockInvalidoException;
 public class Producto extends Base{
     private String nombre;
     private Double precio;
@@ -18,6 +19,7 @@ public class Producto extends Base{
         this.disponible = stock>0;
         this.setCategoria(categoria);
     }
+    // Getters
 
     public String getNombre() {
         return nombre;
@@ -46,6 +48,7 @@ public class Producto extends Base{
     public Categoria getCategoria() {
         return categoria;
     }
+    // Setters
 
     public void setNombre(String nombre){
         if(nombre!=null && !nombre.isBlank()){
@@ -64,8 +67,6 @@ public class Producto extends Base{
         }
     }
 
-
-
     public void setCategoria(Categoria categoria) {
         this.categoria = categoria;
         if(categoria!=null && !categoria.getProductos().contains(this)){
@@ -83,7 +84,6 @@ public class Producto extends Base{
             this.imagen = "sin imagen.png";
         }
     }
-    // En setPrecio, Tienen que crear una carpeta donde exista la excepcion:
     public void setPrecio(Double precio) {
         if (precio != null && precio >= 0) {
             this.precio = precio;
@@ -92,7 +92,6 @@ public class Producto extends Base{
         }
     }
 
-    // En setStock, Tienen que crear una carpeta donde exista la excepcion:
     public void setStock(int stock) {
         if (stock >= 0) {
             this.stock = stock;
