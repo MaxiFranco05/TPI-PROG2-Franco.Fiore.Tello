@@ -16,46 +16,42 @@ import java.util.ArrayList;
 public class Menu {
 
     private final Scanner scanner;
-
     private final List<Categoria> categorias;
     private final List<Producto> productos;
     private final List<Usuario> usuarios;
     private final List<Pedido> pedidos;
 
-    public Menu() {
-        this.scanner = new Scanner(System.in);
-
-        this.categorias = new ArrayList<>();
-        this.productos = new ArrayList<>();
-        this.usuarios = new ArrayList<>();
-        this.pedidos = new ArrayList<>();
+    public Menu(Scanner scanner, List<Categoria> categorias, List<Producto> productos, List<Usuario> usuarios, List<Pedido> pedidos) {
+        this.scanner = scanner;
+        this.categorias = categorias;
+        this.productos = productos;
+        this.usuarios = usuarios;
+        this.pedidos = pedidos;
     }
 
     public void iniciar() {
         int opcion = -1;
-
         do {
             System.out.println("\n=======================================");
-            System.out.println("              MENU PRINCIPAL             ");
+            System.out.println("         PANEL DE ADMINISTRADOR        ");
             System.out.println("=======================================");
             System.out.println("1. Gestión de Categorías");
             System.out.println("2. Gestión de Productos");
             System.out.println("3. Gestión de Usuarios");
             System.out.println("4. Gestión de Pedidos");
-            System.out.println("0. Salir del sistema");
+            System.out.println("0. Volver al Menú Principal");
             System.out.println("=======================================");
             System.out.print("Seleccione una opción: ");
 
             try {
                 opcion = Integer.parseInt(scanner.nextLine());
-
                 switch (opcion) {
                     case 1 -> menuCategorias();
                     case 2 -> menuProductos();
                     case 3 -> menuUsuarios();
                     case 4 -> menuPedidos();
-                    case 0 -> System.out.println("\nCerrando Food Store... ¡Hasta luego!");
-                    default -> System.out.println("Error: Opción inválida. Ingrese un número entre 0 y 4.");
+                    case 0 -> System.out.println("Saliendo del Panel de Administrador...");
+                    default -> System.out.println("Error: Opción inválida.");
                 }
             } catch (NumberFormatException e) {
                 System.out.println("Error de entrada: Por favor, ingrese un número entero válido.");
@@ -64,8 +60,6 @@ public class Menu {
                 System.out.println("Ocurrió un error inesperado: " + e.getMessage());
             }
         } while (opcion != 0);
-
-        scanner.close();
     }
 
     // CATEGORÍAS
