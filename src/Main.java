@@ -1,8 +1,8 @@
-import User_I.Menu;
+import User_I.MenuPrincipal;
 
 public class Main {
     public static void main(String[] args) {
-        Menu menuPrincipal = new Menu();
+        MenuPrincipal menuPrincipal = new MenuPrincipal();
 
         menuPrincipal.iniciar();
     }
