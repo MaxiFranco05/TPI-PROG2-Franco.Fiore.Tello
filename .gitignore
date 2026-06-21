@@ -61,5 +61,8 @@ bin/
 ### Maven ###
 target/
 
+### dotenv ###
+.env
+
 ### Windows ###
 Thumbs.db
