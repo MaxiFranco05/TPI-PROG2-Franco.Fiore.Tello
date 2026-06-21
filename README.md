@@ -29,13 +29,21 @@ mysql -u root -p < src/main/resources/schema.sql
 
 Esto crea la base de datos `pedidos_db`, las tablas y los datos de prueba.
 
-2. Verificar que el archivo `.env` en la raíz del proyecto tenga la configuración correcta:
+2. Copiar `.env.example` como `.env` y configurar las credenciales:
+
+```bash
+cp .env.example .env
+```
+
+3. Editar `.env` con tus credenciales de MySQL:
 
 ```
 DB_URL=jdbc:mysql://localhost:3306/pedidos_db
 DB_USER=root
 DB_PASSWORD=tu_password
 ```
+
+> La configuración de persistencia está centralizada en `config/DatabaseConnection.java`, que lee estos valores usando dotenv-java.
 
 ## Ejecución
 
