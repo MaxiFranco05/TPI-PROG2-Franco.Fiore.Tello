@@ -58,5 +58,8 @@ bin/
 ### Mac OS ###
 .DS_Store
 
+### Maven ###
+target/
+
 ### Windows ###
 Thumbs.db
