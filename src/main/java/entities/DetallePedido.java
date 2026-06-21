@@ -37,8 +37,8 @@ public class DetallePedido extends Base {
     public String toString() {
         return "  DetallePedido [ID=" + getId() + "] " +
                 producto.getNombre() +
-                " x" + cantidad +
-                " | Subtotal: $" + subtotal;
+                " x" + this.getCantidad() +
+                " | Subtotal: $" + this.getSubtotal();
     }
 
 }

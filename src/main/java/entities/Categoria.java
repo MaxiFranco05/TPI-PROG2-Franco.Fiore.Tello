@@ -51,7 +51,7 @@ public class Categoria extends Base{
     }
     @Override
     public String toString() {
-        return "Categoria [ID=" + getId() + "] " + nombre + " - " + descripcion;
+        return "Categoria [ID=" + getId() + "] " + this.getNombre() + " - " + this.getDescripcion();
     }
 
 }

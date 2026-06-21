@@ -2,508 +2,456 @@ package User_I;
 
 import enums.Estado;
 import enums.FormaPago;
-import enums.Rol;
 import entities.Categoria;
 import entities.Producto;
 import entities.Usuario;
 import entities.Pedido;
 import entities.DetallePedido;
+import service.*;
 
 import java.util.Scanner;
 import java.util.List;
-import java.util.ArrayList;
 
 public class Menu {
 
     private final Scanner scanner;
-    private final List<Categoria> categorias;
-    private final List<Producto> productos;
-    private final List<Usuario> usuarios;
-    private final List<Pedido> pedidos;
+    private CategoriaService categoriaService;
+    private ProductoService productoService;
+    private UsuarioService usuarioService;
+    private PedidoService pedidoService;
 
-    public Menu(Scanner scanner, List<Categoria> categorias, List<Producto> productos, List<Usuario> usuarios, List<Pedido> pedidos) {
+    public Menu(Scanner scanner, CategoriaService categoriaService) {
         this.scanner = scanner;
-        this.categorias = categorias;
-        this.productos = productos;
-        this.usuarios = usuarios;
-        this.pedidos = pedidos;
+        this.categoriaService = categoriaService;
     }
 
-    public void iniciar() {
-        int opcion = -1;
-        do {
-            System.out.println("\n=======================================");
-            System.out.println("         PANEL DE ADMINISTRADOR        ");
-            System.out.println("=======================================");
-            System.out.println("1. Gestión de Categorías");
-            System.out.println("2. Gestión de Productos");
-            System.out.println("3. Gestión de Usuarios");
-            System.out.println("4. Gestión de Pedidos");
-            System.out.println("0. Volver al Menú Principal");
-            System.out.println("=======================================");
-            System.out.print("Seleccione una opción: ");
-
-            try {
-                opcion = Integer.parseInt(scanner.nextLine());
-                switch (opcion) {
-                    case 1 -> menuCategorias();
-                    case 2 -> menuProductos();
-                    case 3 -> menuUsuarios();
-                    case 4 -> menuPedidos();
-                    case 0 -> System.out.println("Saliendo del Panel de Administrador...");
-                    default -> System.out.println("Error: Opción inválida.");
-                }
-            } catch (NumberFormatException e) {
-                System.out.println("Error de entrada: Por favor, ingrese un número entero válido.");
-                opcion = -1;
-            } catch (Exception e) {
-                System.out.println("Ocurrió un error inesperado: " + e.getMessage());
-            }
-        } while (opcion != 0);
+    public Menu(Scanner scanner, ProductoService productoService, CategoriaService categoriaService) {
+        this.scanner = scanner;
+        this.productoService = productoService;
+        this.categoriaService = categoriaService;
     }
 
-    // CATEGORÍAS
+    public Menu(Scanner scanner, UsuarioService usuarioService) {
+        this.scanner = scanner;
+        this.usuarioService = usuarioService;
+    }
 
-    private void menuCategorias() {
+    public Menu(Scanner scanner, PedidoService pedidoService, ProductoService productoService, UsuarioService usuarioService) {
+        this.scanner = scanner;
+        this.pedidoService = pedidoService;
+        this.productoService = productoService;
+        this.usuarioService = usuarioService;
+    }
+
+    // ======== CATEGORÍAS ========
+
+    public void iniciarCategoria() {
         int opcion = -1;
         do {
             System.out.println("\n--- GESTIÓN DE CATEGORÍAS ---");
-            System.out.println("1. Listar categorías");
-            System.out.println("2. Crear categoría");
-            System.out.println("3. Editar categoría");
-            System.out.println("4. Eliminar categoría (Baja Lógica)");
+            System.out.println("1. Listar");
+            System.out.println("2. Crear");
+            System.out.println("3. Editar");
+            System.out.println("4. Eliminar");
             System.out.println("0. Volver");
             System.out.print("Seleccione: ");
 
             try {
                 opcion = Integer.parseInt(scanner.nextLine());
                 switch (opcion) {
-                    case 1 -> {
-                        System.out.println("\n>> Listado de Categorías:");
-                        boolean hayCategorias = false;
-                        for (Categoria cat : categorias) {
-                            if (!cat.isEliminado()) {
-                                System.out.println(cat);
-                                hayCategorias = true;
-                            }
-                        }
-                        if (!hayCategorias) {
-                            System.out.println("No hay categorías registradas.");
-                        }
-                    }
-                    case 2 -> {
-                        System.out.print("\nNombre de la categoría: ");
-                        String nombre = scanner.nextLine();
-                        Categoria nuevaCategoria = new Categoria(nombre);
-                        categorias.add(nuevaCategoria);
-                        System.out.println("Categoría creada exitosamente: " + nuevaCategoria);
-                    }
-                    case 3 -> {
-                        System.out.print("\nID de la categoría a editar: ");
-                        Long id = Long.parseLong(scanner.nextLine());
-                        Categoria catAEditar = null;
-                        for (Categoria cat : categorias) {
-                            if (cat.getId().equals(id) && !cat.isEliminado()) {
-                                catAEditar = cat;
-                                break;
-                            }
-                        }
-                        if (catAEditar != null) {
-                            System.out.print("Nuevo nombre: ");
-                            String nuevoNombre = scanner.nextLine();
-                            catAEditar.setNombre(nuevoNombre);
-                            System.out.println("Categoría editada exitosamente.");
-                        } else {
-                            System.out.println("Error: Categoría no encontrada.");
-                        }
-                    }
-                    case 4 -> {
-                        System.out.print("\nID de la categoría a eliminar: ");
-                        Long id = Long.parseLong(scanner.nextLine());
-                        Categoria catAEliminar = null;
-                        for (Categoria cat : categorias) {
-                            if (cat.getId().equals(id) && !cat.isEliminado()) {
-                                catAEliminar = cat;
-                                break;
-                            }
-                        }
-                        if (catAEliminar != null) {
-                            catAEliminar.setEliminado(true);
-                            System.out.println("Categoría eliminada exitosamente (Baja lógica).");
-                        } else {
-                            System.out.println("Error: Categoría no encontrada.");
-                        }
-                    }
-                    case 0 -> System.out.println("Volviendo al menú principal...");
+                    case 1 -> listarCategorias();
+                    case 2 -> crearCategoria();
+                    case 3 -> editarCategoria();
+                    case 4 -> eliminarCategoria();
+                    case 0 -> System.out.println("Volviendo...");
                     default -> System.out.println("Opción incorrecta.");
                 }
             } catch (NumberFormatException e) {
-                System.out.println("Error: Debe ingresar un valor numérico.");
+                System.out.println("Error: Ingrese un número válido.");
             } catch (Exception e) {
-                System.out.println("Error de negocio: " + e.getMessage());
+                System.out.println("Error: " + e.getMessage());
             }
         } while (opcion != 0);
     }
 
-    // PRODUCTOS
+    private void listarCategorias() {
+        System.out.println("\n>> Listado de Categorías:");
+        List<Categoria> lista = categoriaService.listarTodos();
+        if (lista.isEmpty()) {
+            System.out.println("No hay categorías registradas.");
+        } else {
+            for (Categoria c : lista) {
+                System.out.println(c);
+            }
+        }
+    }
 
-    private void menuProductos() {
+    private void crearCategoria() {
+        System.out.print("\nNombre: ");
+        String nombre = scanner.nextLine();
+        System.out.print("Descripción: ");
+        String descripcion = scanner.nextLine();
+        Categoria nueva = new Categoria(nombre, descripcion);
+        categoriaService.guardar(nueva);
+        System.out.println("Categoría creada: " + nueva);
+    }
+
+    private void editarCategoria() {
+        listarCategorias();
+        System.out.print("\nID de la categoría a editar: ");
+        Long id = Long.parseLong(scanner.nextLine());
+        Categoria c = categoriaService.buscarPorId(id);
+        if (c == null || c.isEliminado()) {
+            System.out.println("Error: Categoría no encontrada.");
+            return;
+        }
+        System.out.print("Nuevo nombre (" + c.getNombre() + "): ");
+        String nombre = scanner.nextLine();
+        if (!nombre.isBlank()) c.setNombre(nombre);
+        System.out.print("Nueva descripción (" + c.getDescripcion() + "): ");
+        String desc = scanner.nextLine();
+        if (!desc.isBlank()) c.setDescripcion(desc);
+        categoriaService.actualizar(c);
+        System.out.println("Categoría editada exitosamente.");
+    }
+
+    private void eliminarCategoria() {
+        listarCategorias();
+        System.out.print("\nID de la categoría a eliminar: ");
+        Long id = Long.parseLong(scanner.nextLine());
+        Categoria c = categoriaService.buscarPorId(id);
+        if (c == null || c.isEliminado()) {
+            System.out.println("Error: Categoría no encontrada.");
+            return;
+        }
+        categoriaService.eliminar(id);
+        System.out.println("Categoría eliminada (baja lógica).");
+    }
+
+    // ======== PRODUCTOS ========
+
+    public void iniciarProducto() {
         int opcion = -1;
         do {
             System.out.println("\n--- GESTIÓN DE PRODUCTOS ---");
-            System.out.println("1. Listar productos");
-            System.out.println("2. Crear producto");
-            System.out.println("3. Editar producto");
-            System.out.println("4. Eliminar producto (Baja Lógica)");
+            System.out.println("1. Listar");
+            System.out.println("2. Crear");
+            System.out.println("3. Editar");
+            System.out.println("4. Eliminar");
             System.out.println("0. Volver");
             System.out.print("Seleccione: ");
 
             try {
                 opcion = Integer.parseInt(scanner.nextLine());
                 switch (opcion) {
-                    case 1 -> {
-                        System.out.println("\n>> Listado de Productos:");
-                        boolean hayProductos = false;
-                        for (Producto prod : productos) {
-                            if (!prod.isEliminado()) {
-                                System.out.println(prod);
-                                hayProductos = true;
-                            }
-                        }
-                        if (!hayProductos) {
-                            System.out.println("No hay productos registrados.");
-                        }
-                    }
-                    case 2 -> {
-                        System.out.print("\nNombre del producto: ");
-                        String nombre = scanner.nextLine();
-                        System.out.print("Precio: ");
-                        double precio = Double.parseDouble(scanner.nextLine());
-                        System.out.print("Stock: ");
-                        int stock = Integer.parseInt(scanner.nextLine());
-                        System.out.print("ID Categoría: ");
-                        Long idCat = Long.parseLong(scanner.nextLine());
-
-                        // Buscar la categoría
-                        Categoria catEncontrada = null;
-                        for (Categoria cat : categorias) {
-                            if (cat.getId().equals(idCat) && !cat.isEliminado()) {
-                                catEncontrada = cat;
-                                break;
-                            }
-                        }
-
-                        if (catEncontrada != null) {
-                            Producto nuevo = new Producto(nombre, precio, "Sin descripción", stock, "sin imagen.png", catEncontrada);
-                            productos.add(nuevo);
-                            System.out.println("Producto creado exitosamente: " + nuevo);
-                        } else {
-                            System.out.println("Error: Categoría no encontrada.");
-                        }
-                    }
-                    case 3 -> {
-                        System.out.print("\nID del producto a editar: ");
-                        Long id = Long.parseLong(scanner.nextLine());
-                        Producto prodAEditar = null;
-                        for (Producto p : productos) {
-                            if (p.getId().equals(id) && !p.isEliminado()) {
-                                prodAEditar = p;
-                                break;
-                            }
-                        }
-
-                        if (prodAEditar != null) {
-                            System.out.print("Nuevo nombre: ");
-                            String nuevoNombre = scanner.nextLine();
-                            System.out.print("Nuevo precio: ");
-                            double nuevoPrecio = Double.parseDouble(scanner.nextLine());
-                            System.out.print("Nuevo stock: ");
-                            int nuevoStock = Integer.parseInt(scanner.nextLine());
-
-                            prodAEditar.setNombre(nuevoNombre);
-                            prodAEditar.setPrecio(nuevoPrecio);
-                            prodAEditar.setStock(nuevoStock);
-                            System.out.println("Producto editado exitosamente.");
-                        } else {
-                            System.out.println("Error: Producto no encontrado.");
-                        }
-                    }
-                    case 4 -> {
-                        System.out.print("\nID del producto a eliminar: ");
-                        Long id = Long.parseLong(scanner.nextLine());
-                        Producto prodAEliminar = null;
-                        for (Producto p : productos) {
-                            if (p.getId().equals(id) && !p.isEliminado()) {
-                                prodAEliminar = p;
-                                break;
-                            }
-                        }
-
-                        if (prodAEliminar != null) {
-                            prodAEliminar.setEliminado(true);
-                            System.out.println("Producto eliminado exitosamente (Baja lógica).");
-                        } else {
-                            System.out.println("Error: Producto no encontrado.");
-                        }
-                    }
+                    case 1 -> listarProductos();
+                    case 2 -> crearProducto();
+                    case 3 -> editarProducto();
+                    case 4 -> eliminarProducto();
                     case 0 -> System.out.println("Volviendo...");
                     default -> System.out.println("Opción incorrecta.");
                 }
             } catch (NumberFormatException e) {
-                System.out.println("Error: Formato numérico incorrecto.");
+                System.out.println("Error: Ingrese un número válido.");
             } catch (Exception e) {
                 System.out.println("Error: " + e.getMessage());
             }
         } while (opcion != 0);
     }
 
-    // USUARIOS
+    private void listarProductos() {
+        System.out.println("\n>> Listado de Productos:");
+        List<Producto> lista = productoService.listarTodos();
+        if (lista.isEmpty()) {
+            System.out.println("No hay productos registrados.");
+        } else {
+            for (Producto p : lista) {
+                System.out.println(p);
+            }
+        }
+    }
 
-    private void menuUsuarios() {
+    private void crearProducto() {
+        System.out.print("\nNombre: ");
+        String nombre = scanner.nextLine();
+        System.out.print("Precio: ");
+        double precio = Double.parseDouble(scanner.nextLine());
+        System.out.print("Stock: ");
+        int stock = Integer.parseInt(scanner.nextLine());
+        System.out.print("Descripción: ");
+        String desc = scanner.nextLine();
+
+        listarCategorias();
+        System.out.print("ID Categoría: ");
+        Long idCat = Long.parseLong(scanner.nextLine());
+        Categoria cat = categoriaService.buscarPorId(idCat);
+        if (cat == null || cat.isEliminado()) {
+            System.out.println("Error: Categoría no encontrada.");
+            return;
+        }
+
+        Producto nuevo = new Producto(nombre, precio, desc, stock, "sin imagen.png", cat);
+        productoService.guardar(nuevo);
+        System.out.println("Producto creado: " + nuevo);
+    }
+
+    private void editarProducto() {
+        listarProductos();
+        System.out.print("\nID del producto a editar: ");
+        Long id = Long.parseLong(scanner.nextLine());
+        Producto p = productoService.buscarPorId(id);
+        if (p == null || p.isEliminado()) {
+            System.out.println("Error: Producto no encontrado.");
+            return;
+        }
+        System.out.print("Nuevo nombre (" + p.getNombre() + "): ");
+        String nombre = scanner.nextLine();
+        if (!nombre.isBlank()) p.setNombre(nombre);
+        System.out.print("Nuevo precio (" + p.getPrecio() + "): ");
+        String precioStr = scanner.nextLine();
+        if (!precioStr.isBlank()) p.setPrecio(Double.parseDouble(precioStr));
+        System.out.print("Nuevo stock (" + p.getStock() + "): ");
+        String stockStr = scanner.nextLine();
+        if (!stockStr.isBlank()) p.setStock(Integer.parseInt(stockStr));
+
+        productoService.actualizar(p);
+        System.out.println("Producto editado exitosamente.");
+    }
+
+    private void eliminarProducto() {
+        listarProductos();
+        System.out.print("\nID del producto a eliminar: ");
+        Long id = Long.parseLong(scanner.nextLine());
+        Producto p = productoService.buscarPorId(id);
+        if (p == null || p.isEliminado()) {
+            System.out.println("Error: Producto no encontrado.");
+            return;
+        }
+        productoService.eliminar(id);
+        System.out.println("Producto eliminado (baja lógica).");
+    }
+
+    // ======== USUARIOS ========
+
+    public void iniciarUsuario() {
         int opcion = -1;
         do {
             System.out.println("\n--- GESTIÓN DE USUARIOS ---");
-            System.out.println("1. Listar usuarios");
-            System.out.println("2. Crear usuario");
+            System.out.println("1. Listar");
+            System.out.println("2. Crear");
             System.out.println("0. Volver");
             System.out.print("Seleccione: ");
 
             try {
                 opcion = Integer.parseInt(scanner.nextLine());
                 switch (opcion) {
-                    case 1 -> {
-                        System.out.println("\n>> Listado de Usuarios:");
-                        boolean hayUsuarios = false;
-                        for (Usuario user : usuarios) {
-                            if (!user.isEliminado()) {
-                                System.out.println(user);
-                                hayUsuarios = true;
-                            }
-                        }
-                        if (!hayUsuarios) {
-                            System.out.println("No hay usuarios registrados.");
-                        }
-                    }
-                    case 2 -> {
-                        System.out.print("\nNombre: ");
-                        String nombre = scanner.nextLine();
-                        System.out.print("Apellido: ");
-                        String apellido = scanner.nextLine();
-                        System.out.print("Email: ");
-                        String email = scanner.nextLine();
-                        System.out.print("Celular: ");
-                        String celular = scanner.nextLine();
-                        System.out.print("Contraseña: ");
-                        String contrasena = scanner.nextLine();
-                        System.out.print("Rol (1. ADMIN, 2. CLIENTE): ");
-                        int rolSel = Integer.parseInt(scanner.nextLine());
-                        Rol rol = (rolSel == 1) ? Rol.ADMIN : Rol.USUARIO;
-
-                        Usuario nuevo = new Usuario(nombre, apellido, email, celular, contrasena, rol);
-                        usuarios.add(nuevo);
-                        System.out.println("Usuario creado exitosamente: " + nuevo);
-                    }
+                    case 1 -> listarUsuarios();
+                    case 2 -> crearUsuario();
                     case 0 -> System.out.println("Volviendo...");
                     default -> System.out.println("Opción incorrecta.");
                 }
             } catch (NumberFormatException e) {
-                System.out.println("Error: Entrada numérica inválida.");
+                System.out.println("Error: Ingrese un número válido.");
             } catch (Exception e) {
                 System.out.println("Error: " + e.getMessage());
             }
         } while (opcion != 0);
     }
 
+    private void listarUsuarios() {
+        System.out.println("\n>> Listado de Usuarios:");
+        List<Usuario> lista = usuarioService.listarTodos();
+        if (lista.isEmpty()) {
+            System.out.println("No hay usuarios registrados.");
+        } else {
+            for (Usuario u : lista) {
+                System.out.println(u);
+            }
+        }
+    }
 
-    // PEDIDOS
+    private void crearUsuario() {
+        System.out.print("\nNombre: ");
+        String nombre = scanner.nextLine();
+        System.out.print("Apellido: ");
+        String apellido = scanner.nextLine();
+        System.out.print("Email: ");
+        String email = scanner.nextLine();
+        System.out.print("Celular: ");
+        String celular = scanner.nextLine();
+        System.out.print("Contraseña: ");
+        String contrasena = scanner.nextLine();
+        System.out.print("Rol (1. ADMIN, 2. USUARIO): ");
+        int rolSel = Integer.parseInt(scanner.nextLine());
+        enums.Rol rol = (rolSel == 1) ? enums.Rol.ADMIN : enums.Rol.USUARIO;
 
-    private void menuPedidos() {
+        Usuario nuevo = new Usuario(nombre, apellido, email, celular, contrasena, rol);
+        usuarioService.guardar(nuevo);
+        System.out.println("Usuario creado: " + nuevo);
+    }
+
+    // ======== PEDIDOS ========
+
+    public void iniciarPedido() {
         int opcion = -1;
         do {
             System.out.println("\n--- GESTIÓN DE PEDIDOS ---");
-            System.out.println("1. Listar pedidos activos");
-            System.out.println("2. Crear nuevo pedido (con detalles)");
+            System.out.println("1. Listar");
+            System.out.println("2. Crear (con detalles)");
             System.out.println("3. Actualizar Estado / Forma de Pago");
-            System.out.println("4. Cancelar/Eliminar pedido");
+            System.out.println("4. Cancelar/Eliminar");
             System.out.println("0. Volver");
             System.out.print("Seleccione: ");
 
             try {
                 opcion = Integer.parseInt(scanner.nextLine());
                 switch (opcion) {
-                    case 1 -> {
-                        System.out.println("\n>> Listado de Pedidos:");
-                        boolean hayPedidos = false;
-                        for (Pedido ped : pedidos) {
-                            if (!ped.isEliminado()) {
-                                System.out.println(ped);
-                                for (DetallePedido det : ped.getDetalles()) {
-                                    System.out.println(det);
-                                }
-                                hayPedidos = true;
-                            }
-                        }
-                        if (!hayPedidos) {
-                            System.out.println("No hay pedidos registrados.");
-                        }
-                    }
-                    case 2 -> registrarPedidoConDetalles();
-                    case 3 -> {
-                        System.out.print("\nID Pedido a actualizar: ");
-                        Long idPed = Long.parseLong(scanner.nextLine());
-                        Pedido pedAActualizar = null;
-                        for (Pedido p : pedidos) {
-                            if (p.getId().equals(idPed) && !p.isEliminado()) {
-                                pedAActualizar = p;
-                                break;
-                            }
-                        }
-                        if (pedAActualizar != null) {
-                            System.out.println("1. PENDIENTE, 2. CONFIRMADO, 3. TERMINADO, 4. CANCELADO");
-                            System.out.print("Nuevo Estado: ");
-                            int est = Integer.parseInt(scanner.nextLine());
-                            Estado estado = Estado.values()[est - 1];
-                            pedAActualizar.setEstado(estado);
-
-                            // Si se cancela el pedido, devolvemos el stock
-                            if (estado == Estado.CANCELADO) {
-                                for (DetallePedido d : pedAActualizar.getDetalles()) {
-                                    Producto prod = d.getProducto();
-                                    prod.setStock(prod.getStock() + d.getCantidad());
-                                }
-                            }
-
-                            System.out.print("¿Desea cambiar la Forma de Pago? (S/N): ");
-                            String cambiarFP = scanner.nextLine();
-                            if (cambiarFP.equalsIgnoreCase("S")) {
-                                System.out.println("1. TARJETA, 2. TRANSFERENCIA, 3. EFECTIVO");
-                                System.out.print("Seleccione Forma de Pago: ");
-                                int fpSel = Integer.parseInt(scanner.nextLine());
-                                FormaPago formaPago = FormaPago.values()[fpSel - 1];
-                                pedAActualizar.setFormaPago(formaPago);
-                            }
-                            System.out.println("Pedido actualizado con éxito.");
-                        } else {
-                            System.out.println("Error: Pedido no encontrado.");
-                        }
-                    }
-                    case 4 -> {
-                        System.out.print("\nID Pedido a eliminar: ");
-                        Long idPed = Long.parseLong(scanner.nextLine());
-                        Pedido pedAEliminar = null;
-                        for (Pedido p : pedidos) {
-                            if (p.getId().equals(idPed) && !p.isEliminado()) {
-                                pedAEliminar = p;
-                                break;
-                            }
-                        }
-                        if (pedAEliminar != null) {
-                            // Devolver stock
-                            for (DetallePedido d : pedAEliminar.getDetalles()) {
-                                Producto prod = d.getProducto();
-                                prod.setStock(prod.getStock() + d.getCantidad());
-                            }
-                            pedAEliminar.setEliminado(true);
-                            pedAEliminar.setEstado(Estado.CANCELADO);
-                            System.out.println("Pedido eliminado y cancelado con éxito. Se reintegró el stock.");
-                        } else {
-                            System.out.println("Error: Pedido no encontrado.");
-                        }
-                    }
+                    case 1 -> listarPedidos();
+                    case 2 -> crearPedido();
+                    case 3 -> actualizarPedido();
+                    case 4 -> eliminarPedido();
                     case 0 -> System.out.println("Volviendo...");
                     default -> System.out.println("Opción incorrecta.");
                 }
             } catch (NumberFormatException e) {
-                System.out.println("Error Datos numéricos mal ingresados.");
-            } catch (ArrayIndexOutOfBoundsException e) {
-                System.out.println("Error Selección de Enum fuera de rango.");
+                System.out.println("Error: Ingrese un número válido.");
             } catch (Exception e) {
-                System.out.println("Error " + e.getMessage());
+                System.out.println("Error: " + e.getMessage());
             }
         } while (opcion != 0);
     }
 
-    private void registrarPedidoConDetalles() {
-        try {
-            System.out.println("\n--- NUEVO PEDIDO ---");
-            System.out.print("ID del Usuario cliente: ");
-            Long idUsuario = Long.parseLong(scanner.nextLine());
-
-            Usuario usuarioEncontrado = null;
-            for (Usuario u : usuarios) {
-                if (u.getId().equals(idUsuario) && !u.isEliminado()) {
-                    usuarioEncontrado = u;
-                    break;
+    private void listarPedidos() {
+        System.out.println("\n>> Listado de Pedidos:");
+        List<Pedido> lista = pedidoService.listarTodos();
+        if (lista.isEmpty()) {
+            System.out.println("No hay pedidos registrados.");
+        } else {
+            for (Pedido p : lista) {
+                System.out.println(p);
+                for (DetallePedido d : p.getDetalles()) {
+                    System.out.println("  " + d);
                 }
             }
+        }
+    }
 
-            if (usuarioEncontrado == null) {
-                System.out.println("Error: Usuario no encontrado o eliminado.");
+    private void crearPedido() {
+        try {
+            System.out.println("\n--- NUEVO PEDIDO ---");
+            listarUsuarios();
+            System.out.print("ID del Usuario: ");
+            Long idUsuario = Long.parseLong(scanner.nextLine());
+            Usuario usuario = usuarioService.buscarPorId(idUsuario);
+            if (usuario == null || usuario.isEliminado()) {
+                System.out.println("Error: Usuario no encontrado.");
                 return;
             }
 
             System.out.println("Formas de Pago: 1. TARJETA, 2. TRANSFERENCIA, 3. EFECTIVO");
-            System.out.print("Seleccione Forma de Pago: ");
+            System.out.print("Seleccione: ");
             int fpSel = Integer.parseInt(scanner.nextLine());
             FormaPago formaPago = FormaPago.values()[fpSel - 1];
 
-            Pedido nuevoPedido = new Pedido(usuarioEncontrado, formaPago);
+            Pedido nuevoPedido = new Pedido(usuario, formaPago);
 
             boolean seguir = true;
             while (seguir) {
+                listarProductos();
                 System.out.print("\nID del Producto a agregar: ");
                 Long idProducto = Long.parseLong(scanner.nextLine());
-
-                Producto prodEncontrado = null;
-                for (Producto p : productos) {
-                    if (p.getId().equals(idProducto) && !p.isEliminado()) {
-                        prodEncontrado = p;
-                        break;
-                    }
-                }
-
-                if (prodEncontrado == null) {
-                    System.out.println("Error: Producto no encontrado o eliminado.");
+                Producto prod = productoService.buscarPorId(idProducto);
+                if (prod == null || prod.isEliminado() || !prod.getDisponible()) {
+                    System.out.println("Error: Producto no disponible.");
                     System.out.print("¿Intentar de nuevo? (S/N): ");
-                    if (scanner.nextLine().equalsIgnoreCase("N")) {
-                        seguir = false;
-                    }
+                    if (scanner.nextLine().equalsIgnoreCase("N")) seguir = false;
                     continue;
                 }
 
                 System.out.print("Cantidad: ");
                 int cantidad = Integer.parseInt(scanner.nextLine());
-
-                if (prodEncontrado.getStock() < cantidad) {
-                    System.out.println("Error: Stock insuficiente. Stock actual: " + prodEncontrado.getStock());
+                if (cantidad <= 0) {
+                    System.out.println("Error: Cantidad debe ser mayor a 0.");
+                    continue;
+                }
+                if (prod.getStock() < cantidad) {
+                    System.out.println("Error: Stock insuficiente. Stock actual: " + prod.getStock());
                     continue;
                 }
 
-                // Agregar detalle
-                nuevoPedido.addDetallePedido(cantidad, prodEncontrado.getPrecio(), prodEncontrado);
-                // Restar stock
-                prodEncontrado.setStock(prodEncontrado.getStock() - cantidad);
-
-                System.out.println("Producto agregado al carrito.");
+                nuevoPedido.addDetallePedido(cantidad, prod.getPrecio(), prod);
+                prod.setStock(prod.getStock() - cantidad);
+                productoService.actualizar(prod);
+                System.out.println("Producto agregado.");
 
                 System.out.print("¿Agregar otro producto? (S/N): ");
-                String rta = scanner.nextLine();
-                if (rta.equalsIgnoreCase("N")) {
-                    seguir = false;
-                }
+                if (scanner.nextLine().equalsIgnoreCase("N")) seguir = false;
             }
 
             if (!nuevoPedido.getDetalles().isEmpty()) {
-                pedidos.add(nuevoPedido);
-                usuarioEncontrado.addPedido(nuevoPedido);
-                System.out.println("Pedido registrado y total calculado con éxito.");
-                System.out.println("Total del Pedido: $" + nuevoPedido.getTotal());
+                pedidoService.guardarConDetalles(nuevoPedido);
+                System.out.println("Pedido registrado. Total: $" + nuevoPedido.getTotal());
             } else {
-                System.out.println("No se agregaron productos. Pedido descartado.");
+                System.out.println("Pedido descartado (sin productos).");
             }
-
         } catch (Exception e) {
-            System.out.println("No se pudo crear el pedido: " + e.getMessage());
+            System.out.println("Error al crear pedido: " + e.getMessage());
         }
+    }
+
+    private void actualizarPedido() {
+        listarPedidos();
+        System.out.print("\nID Pedido a actualizar: ");
+        Long id = Long.parseLong(scanner.nextLine());
+        Pedido p = pedidoService.buscarPorId(id);
+        if (p == null || p.isEliminado()) {
+            System.out.println("Error: Pedido no encontrado.");
+            return;
+        }
+
+        System.out.println("1. PENDIENTE, 2. CONFIRMADO, 3. TERMINADO, 4. CANCELADO");
+        System.out.print("Nuevo Estado: ");
+        int est = Integer.parseInt(scanner.nextLine());
+        Estado estado = Estado.values()[est - 1];
+        p.setEstado(estado);
+
+        if (estado == Estado.CANCELADO) {
+            for (DetallePedido d : p.getDetalles()) {
+                Producto prod = d.getProducto();
+                prod.setStock(prod.getStock() + d.getCantidad());
+                productoService.actualizar(prod);
+            }
+        }
+
+        System.out.print("¿Cambiar Forma de Pago? (S/N): ");
+        if (scanner.nextLine().equalsIgnoreCase("S")) {
+            System.out.println("1. TARJETA, 2. TRANSFERENCIA, 3. EFECTIVO");
+            System.out.print("Seleccione: ");
+            int fp = Integer.parseInt(scanner.nextLine());
+            p.setFormaPago(FormaPago.values()[fp - 1]);
+        }
+
+        pedidoService.actualizar(p);
+        System.out.println("Pedido actualizado.");
+    }
+
+    private void eliminarPedido() {
+        listarPedidos();
+        System.out.print("\nID Pedido a eliminar: ");
+        Long id = Long.parseLong(scanner.nextLine());
+        Pedido p = pedidoService.buscarPorId(id);
+        if (p == null || p.isEliminado()) {
+            System.out.println("Error: Pedido no encontrado.");
+            return;
+        }
+
+        for (DetallePedido d : p.getDetalles()) {
+            Producto prod = d.getProducto();
+            prod.setStock(prod.getStock() + d.getCantidad());
+            productoService.actualizar(prod);
+        }
+
+        pedidoService.eliminar(id);
+        System.out.println("Pedido cancelado y stock reintegrado.");
     }
 }

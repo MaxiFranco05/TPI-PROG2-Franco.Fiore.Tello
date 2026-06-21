@@ -66,11 +66,11 @@ public class Usuario extends Base {
 
     @Override
     public String toString() {
-        return "Usuario [ID=" + getId() + "] " + nombre + " " + apellido +
-                " | Mail: " + mail +
-                " | Celular: " + celular +
-                " | Rol: " + rol +
-                " | Pedidos: " + pedidos.size();
+        return "Usuario [ID=" + getId() + "] " + this.getNombre() + " " + this.getApellido() +
+                " | Mail: " + this.getMail() +
+                " | Celular: " + this.getCelular() +
+                " | Rol: " + this.getRol() +
+                " | Pedidos: " + this.getPedidos().size();
     }
 
     @Override

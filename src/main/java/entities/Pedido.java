@@ -77,9 +77,9 @@ public class Pedido extends Base implements Calculable {
     public String toString() {
         return "Pedido [ID=" + getId() + "]" +
                 " | Usuario: " + usuario.getNombre() + " " + usuario.getApellido() +
-                " | Estado: " + estado +
-                " | FormaPago: " + formaPago +
-                " | Total: $" + total +
-                " | Fecha: " + fecha;
+                " | Estado: " + this.getEstado() +
+                " | FormaPago: " + this.getFormaPago() +
+                " | Total: $" + this.getTotal() +
+                " | Fecha: " + this.getFecha();
     }
 }

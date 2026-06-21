@@ -103,11 +103,11 @@ public class Producto extends Base{
 
     @Override
     public String toString() {
-        return "Producto [ID=" + getId() + "] " + nombre +
-                " | Precio: $" + precio +
-                " | Stock: " + stock +
-                " | Categoría: " + (categoria != null ? categoria.getNombre() : "Sin categoría") +
-                " | Disponible: " + (disponible ? "Sí" : "No");
+        return "Producto [ID=" + getId() + "] " + this.getNombre() +
+                " | Precio: $" + this.getPrecio() +
+                " | Stock: " + this.getStock() +
+                " | Categoría: " + (this.getCategoria() != null ? this.getCategoria().getNombre() : "Sin categoría") +
+                " | Disponible: " + (this.getDisponible() ? "Sí" : "No");
     }
 
     @Override

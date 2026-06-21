@@ -13,16 +13,18 @@ public abstract class Base {
         createdAt = LocalDateTime.now();
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public boolean isEliminado() {
         return eliminado;
-
     }
 
     public void setEliminado(boolean eliminado) {
         this.eliminado = eliminado;
-
     }
+
     public Long getId() {
         return id;
     }
