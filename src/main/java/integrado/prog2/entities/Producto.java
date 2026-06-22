@@ -29,6 +29,7 @@ public class Producto extends Base{
     public int getStock() { return stock; }
     public String getImagen() { return imagen; }
     public Boolean getDisponible() { return disponible; }
+    public void setDisponible(Boolean disponible) { this.disponible = disponible; }
     public Categoria getCategoria() { return categoria; }
 
     public void setNombre(String nombre){

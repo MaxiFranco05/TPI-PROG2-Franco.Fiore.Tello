@@ -79,7 +79,7 @@ public class Menu {
         System.out.println("\n>> Listado de Categorías:");
         List<Categoria> lista = categoriaService.listarTodos();
         if (lista.isEmpty()) {
-            System.out.println("No hay categorías registradas.");
+            System.out.println("No hay categorías cargadas.");
         } else {
             for (Categoria c : lista) {
                 System.out.println(c);
@@ -90,6 +90,10 @@ public class Menu {
     private void crearCategoria() {
         System.out.print("\nNombre: ");
         String nombre = scanner.nextLine();
+        if (categoriaService.existePorNombre(nombre)) {
+            System.out.println("Error: Ya existe una categoría con ese nombre.");
+            return;
+        }
         System.out.print("Descripción: ");
         String descripcion = scanner.nextLine();
         Categoria nueva = new Categoria(nombre, descripcion);
@@ -123,6 +127,11 @@ public class Menu {
         Categoria c = categoriaService.buscarPorId(id);
         if (c == null || c.isEliminado()) {
             System.out.println("Error: Categoría no encontrada.");
+            return;
+        }
+        System.out.print("¿Confirma eliminación? (S/N): ");
+        if (!scanner.nextLine().equalsIgnoreCase("S")) {
+            System.out.println("Operación cancelada.");
             return;
         }
         categoriaService.eliminar(id);
@@ -162,7 +171,16 @@ public class Menu {
 
     private void listarProductos() {
         System.out.println("\n>> Listado de Productos:");
-        List<Producto> lista = productoService.listarTodos();
+        System.out.print("¿Filtrar por categoría? (S/N): ");
+        List<Producto> lista;
+        if (scanner.nextLine().equalsIgnoreCase("S")) {
+            listarCategorias();
+            System.out.print("ID de categoría: ");
+            Long idCat = Long.parseLong(scanner.nextLine());
+            lista = productoService.listarPorCategoria(idCat);
+        } else {
+            lista = productoService.listarTodos();
+        }
         if (lista.isEmpty()) {
             System.out.println("No hay productos registrados.");
         } else {
@@ -181,6 +199,9 @@ public class Menu {
         int stock = Integer.parseInt(scanner.nextLine());
         System.out.print("Descripción: ");
         String desc = scanner.nextLine();
+        System.out.print("Imagen (Enter para 'sin imagen.png'): ");
+        String imagen = scanner.nextLine();
+        if (imagen.isBlank()) imagen = "sin imagen.png";
 
         listarCategorias();
         System.out.print("ID Categoría: ");
@@ -191,7 +212,12 @@ public class Menu {
             return;
         }
 
-        Producto nuevo = new Producto(nombre, precio, desc, stock, "sin imagen.png", cat);
+        Producto nuevo = new Producto(nombre, precio, desc, stock, imagen, cat);
+        System.out.print("¿Disponible? (S/N, Enter = " + (nuevo.getDisponible() ? "Sí" : "No") + "): ");
+        String dispStr = scanner.nextLine();
+        if (dispStr.equalsIgnoreCase("S") || dispStr.equalsIgnoreCase("N")) {
+            nuevo.setDisponible(dispStr.equalsIgnoreCase("S"));
+        }
         productoService.guardar(nuevo);
         System.out.println("Producto creado: " + nuevo);
     }
@@ -228,6 +254,11 @@ public class Menu {
             System.out.println("Error: Producto no encontrado.");
             return;
         }
+        System.out.print("¿Confirma eliminación? (S/N): ");
+        if (!scanner.nextLine().equalsIgnoreCase("S")) {
+            System.out.println("Operación cancelada.");
+            return;
+        }
         productoService.eliminar(id);
         System.out.println("Producto eliminado (baja lógica).");
     }
@@ -240,6 +271,8 @@ public class Menu {
             System.out.println("\n--- GESTIÓN DE USUARIOS ---");
             System.out.println("1. Listar");
             System.out.println("2. Crear");
+            System.out.println("3. Editar");
+            System.out.println("4. Eliminar");
             System.out.println("0. Volver");
             System.out.print("Seleccione: ");
 
@@ -248,6 +281,8 @@ public class Menu {
                 switch (opcion) {
                     case 1 -> listarUsuarios();
                     case 2 -> crearUsuario();
+                    case 3 -> editarUsuario();
+                    case 4 -> eliminarUsuario();
                     case 0 -> System.out.println("Volviendo...");
                     default -> System.out.println("Opción incorrecta.");
                 }
@@ -291,6 +326,52 @@ public class Menu {
         System.out.println("Usuario creado: " + nuevo);
     }
 
+    private void editarUsuario() {
+        listarUsuarios();
+        System.out.print("\nID del usuario a editar: ");
+        Long id = Long.parseLong(scanner.nextLine());
+        Usuario u = usuarioService.buscarPorId(id);
+        if (u == null || u.isEliminado()) {
+            System.out.println("Error: Usuario no encontrado.");
+            return;
+        }
+        System.out.print("Nuevo nombre (" + u.getNombre() + "): ");
+        String nombre = scanner.nextLine();
+        if (!nombre.isBlank()) u.setNombre(nombre);
+        System.out.print("Nuevo apellido (" + u.getApellido() + "): ");
+        String apellido = scanner.nextLine();
+        if (!apellido.isBlank()) u.setApellido(apellido);
+        System.out.print("Nuevo email (" + u.getMail() + "): ");
+        String email = scanner.nextLine();
+        if (!email.isBlank()) u.setMail(email);
+        System.out.print("Nuevo celular (" + u.getCelular() + "): ");
+        String celular = scanner.nextLine();
+        if (!celular.isBlank()) u.setCelular(celular);
+        System.out.print("Nuevo rol (1. ADMIN, 2. USUARIO): ");
+        String rolStr = scanner.nextLine();
+        if (!rolStr.isBlank()) u.setRol(Integer.parseInt(rolStr) == 1 ? Rol.ADMIN : Rol.USUARIO);
+        usuarioService.actualizar(u);
+        System.out.println("Usuario editado exitosamente.");
+    }
+
+    private void eliminarUsuario() {
+        listarUsuarios();
+        System.out.print("\nID del usuario a eliminar: ");
+        Long id = Long.parseLong(scanner.nextLine());
+        Usuario u = usuarioService.buscarPorId(id);
+        if (u == null || u.isEliminado()) {
+            System.out.println("Error: Usuario no encontrado.");
+            return;
+        }
+        System.out.print("¿Confirma eliminación? (S/N): ");
+        if (!scanner.nextLine().equalsIgnoreCase("S")) {
+            System.out.println("Operación cancelada.");
+            return;
+        }
+        usuarioService.eliminar(id);
+        System.out.println("Usuario eliminado (baja lógica).");
+    }
+
     // ======== PEDIDOS ========
 
     public void iniciarPedido() {
@@ -301,6 +382,7 @@ public class Menu {
             System.out.println("2. Crear (con detalles)");
             System.out.println("3. Actualizar Estado / Forma de Pago");
             System.out.println("4. Cancelar/Eliminar");
+            System.out.println("5. Listar por Usuario");
             System.out.println("0. Volver");
             System.out.print("Seleccione: ");
 
@@ -311,6 +393,7 @@ public class Menu {
                     case 2 -> crearPedido();
                     case 3 -> actualizarPedido();
                     case 4 -> eliminarPedido();
+                    case 5 -> listarPedidosPorUsuario();
                     case 0 -> System.out.println("Volviendo...");
                     default -> System.out.println("Opción incorrecta.");
                 }
@@ -436,6 +519,24 @@ public class Menu {
         System.out.println("Pedido actualizado.");
     }
 
+    private void listarPedidosPorUsuario() {
+        listarUsuarios();
+        System.out.print("\nID del usuario: ");
+        Long idUsuario = Long.parseLong(scanner.nextLine());
+        System.out.println("\n>> Pedidos del usuario:");
+        List<Pedido> lista = pedidoService.listarPorUsuario(idUsuario);
+        if (lista.isEmpty()) {
+            System.out.println("El usuario no tiene pedidos registrados.");
+        } else {
+            for (Pedido p : lista) {
+                System.out.println(p);
+                for (DetallePedido d : p.getDetalles()) {
+                    System.out.println("  " + d);
+                }
+            }
+        }
+    }
+
     private void eliminarPedido() {
         listarPedidos();
         System.out.print("\nID Pedido a eliminar: ");
@@ -443,6 +544,12 @@ public class Menu {
         Pedido p = pedidoService.buscarPorId(id);
         if (p == null || p.isEliminado()) {
             System.out.println("Error: Pedido no encontrado.");
+            return;
+        }
+
+        System.out.print("¿Confirma eliminación? (S/N): ");
+        if (!scanner.nextLine().equalsIgnoreCase("S")) {
+            System.out.println("Operación cancelada.");
             return;
         }
 

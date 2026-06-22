@@ -9,6 +9,19 @@ import java.util.List;
 
 public class CategoriaDAO implements IDAO<Categoria> {
 
+    public boolean existePorNombre(String nombre) {
+        String sql = "SELECT COUNT(*) FROM categoria WHERE nombre = ? AND eliminado = false";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, nombre);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() && rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al verificar nombre de categoría", e);
+        }
+    }
+
     @Override
     public void guardar(Categoria c) {
         String sql = "INSERT INTO categoria (nombre, descripcion, eliminado) VALUES (?, ?, ?)";

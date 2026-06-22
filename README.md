@@ -29,13 +29,21 @@ mysql -u root -p < src/main/resources/schema.sql
 
 Esto crea la base de datos `pedidos_db`, las tablas y los datos de prueba.
 
-2. Verificar que el archivo `.env` en la raíz del proyecto tenga la configuración correcta:
+2. Copiar `.env.example` como `.env` y configurar las credenciales:
+
+```bash
+cp .env.example .env
+```
+
+3. Editar `.env` con tus credenciales de MySQL:
 
 ```
 DB_URL=jdbc:mysql://localhost:3306/pedidos_db
 DB_USER=root
 DB_PASSWORD=tu_password
 ```
+
+> La configuración de persistencia está centralizada en `config/DatabaseConnection.java`, que lee estos valores usando dotenv-java.
 
 ## Ejecución
 
@@ -93,19 +101,21 @@ src/main/java/integrado/prog2/
 ## Funcionalidades
 
 ### CRUD Completo
-- **Categorías**: Listar, crear, editar, eliminar (baja lógica)
-- **Productos**: Listar, crear, editar, eliminar (baja lógica)
-- **Usuarios**: Listar, crear
-- **Pedidos**: Listar, crear con múltiples detalles, actualizar estado/forma de pago, cancelar
+- **Categorías**: Listar, crear (con validación de nombre único), editar, eliminar (baja lógica con confirmación)
+- **Productos**: Listar (con filtro opcional por categoría), crear, editar, eliminar (baja lógica con confirmación)
+- **Usuarios**: Listar, crear, editar, eliminar (baja lógica con confirmación)
+- **Pedidos**: Listar (con filtro opcional por usuario), crear con múltiples detalles, actualizar estado/forma de pago, cancelar (con confirmación y reintegro de stock)
 
 ### Validaciones de Negocio
 - Precio de producto no puede ser negativo
 - Stock de producto no puede ser negativo
 - Nombre de producto no puede estar vacío
+- Nombre de categoría único (validación antes de insertar)
 - Mail de usuario único (UNIQUE constraint + captura de excepción)
 - Pedido requiere un usuario asociado
 - Cantidad en detalle de pedido debe ser mayor a 0
 - Stock suficiente al agregar producto a un pedido
+- Confirmación obligatoria (S/N) antes de cualquier eliminación
 
 ### Transacciones
 La creación de pedidos con múltiples detalles se maneja con transacciones manuales:

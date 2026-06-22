@@ -20,6 +20,10 @@ public class ProductoService {
         return productoDAO.listarTodos();
     }
 
+    public List<Producto> listarPorCategoria(Long idCategoria) {
+        return productoDAO.listarPorCategoria(idCategoria);
+    }
+
     public void actualizar(Producto p) {
         productoDAO.actualizar(p);
     }

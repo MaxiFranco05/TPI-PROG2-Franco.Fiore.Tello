@@ -8,6 +8,10 @@ import java.util.List;
 public class CategoriaService {
     private final CategoriaDAO categoriaDAO = new CategoriaDAO();
 
+    public boolean existePorNombre(String nombre) {
+        return categoriaDAO.existePorNombre(nombre);
+    }
+
     public void guardar(Categoria c) {
         categoriaDAO.guardar(c);
     }
