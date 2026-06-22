@@ -26,6 +26,10 @@ public class PedidoService {
         return pedidoDAO.listarTodos();
     }
 
+    public List<Pedido> listarPorUsuario(Long idUsuario) {
+        return pedidoDAO.listarPorUsuario(idUsuario);
+    }
+
     public void actualizar(Pedido p) {
         pedidoDAO.actualizar(p);
     }

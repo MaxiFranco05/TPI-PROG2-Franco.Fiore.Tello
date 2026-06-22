@@ -65,6 +65,21 @@ public class PedidoDAO implements IDAO<Pedido> {
         return lista;
     }
 
+    public List<Pedido> listarPorUsuario(Long idUsuario) {
+        List<Pedido> lista = new ArrayList<>();
+        String sql = "SELECT * FROM pedido WHERE id_usuario = ? AND eliminado = false";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, idUsuario);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) lista.add(map(rs));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al listar pedidos por usuario", e);
+        }
+        return lista;
+    }
+
     @Override
     public void actualizar(Pedido p) {
         String sql = "UPDATE pedido SET fecha = ?, estado = ?, total = ?, forma_pago = ?, id_usuario = ? WHERE id = ?";
@@ -84,11 +99,15 @@ public class PedidoDAO implements IDAO<Pedido> {
 
     @Override
     public void eliminar(Long id) {
-        String sql = "UPDATE pedido SET eliminado = true WHERE id = ?";
+        String sqlPedido = "UPDATE pedido SET eliminado = true WHERE id = ?";
+        String sqlDetalles = "UPDATE detalle_pedido SET eliminado = true WHERE id_pedido = ?";
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setLong(1, id);
-            ps.executeUpdate();
+             PreparedStatement ps1 = conn.prepareStatement(sqlPedido);
+             PreparedStatement ps2 = conn.prepareStatement(sqlDetalles)) {
+            ps1.setLong(1, id);
+            ps1.executeUpdate();
+            ps2.setLong(1, id);
+            ps2.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("Error al eliminar pedido", e);
         }

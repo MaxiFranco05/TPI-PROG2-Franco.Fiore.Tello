@@ -63,6 +63,21 @@ public class ProductoDAO implements IDAO<Producto> {
         return lista;
     }
 
+    public List<Producto> listarPorCategoria(Long idCategoria) {
+        List<Producto> lista = new ArrayList<>();
+        String sql = "SELECT * FROM producto WHERE id_categoria = ? AND eliminado = false";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, idCategoria);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) lista.add(map(rs));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al listar productos por categoría", e);
+        }
+        return lista;
+    }
+
     @Override
     public void actualizar(Producto p) {
         String sql = "UPDATE producto SET nombre = ?, precio = ?, descripcion = ?, stock = ?, imagen = ?, disponible = ?, id_categoria = ? WHERE id = ?";
